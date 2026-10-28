@@ -784,8 +784,6 @@ class Settings(BaseSettings):
     linkedin_client_id: str = ""
     linkedin_client_secret: str = ""
 
-    slack_client_id: str = ""
-    slack_client_secret: str = ""
     x_client_id: str = ""
     x_client_secret: str = ""
     # TikTok issues a separate app (and separate key/secret) per sandbox, so a dev deployment

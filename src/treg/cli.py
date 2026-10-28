@@ -1023,16 +1023,6 @@ def _spinner(msg: str):
         _SPINNER_ACTIVE = False
 
 
-def _show_calls(cfg: dict) -> None:
-    with _client(cfg) as c:
-        calls = c.get("/calls", params={"limit": 6}).json()
-    for cr in (calls if isinstance(calls, list) else [])[:6]:
-        st = cr.get("status_code", "")
-        col = _G if (isinstance(st, int) and st < 400) else _M
-        print(f"   {cr.get('user_email',''):<26}{_M}{cr.get('method',''):<5}{_R}{col}{st}{_R}  {_M}{cr.get('tool_name','')}{_R}")
-    _arrow("full log:  treg audit")
-
-
 _ONBOARD_SUGGESTIONS = [
     ("a TikTok profile", "tiktok profile"),
     ("backlinks for a domain", "backlinks for a domain"),

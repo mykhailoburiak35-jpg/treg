@@ -249,15 +249,6 @@ def _require_public_base_url(base_url: str) -> None:
             "base_url may not be treg itself: call treg's tools by their ids, not through a tool of your own"))
 
 
-async def _require_secret_ownership(secret: Secret, caller: Caller) -> None:
-    try:
-        await binding_rules.require_secret_ownership(
-            secret, caller_email=caller.email,
-            caller_is_admin=_role_at_least(caller.role, "admin"))
-    except SecretOwnershipError as exc:
-        raise HTTPException(status_code=403, detail=exc.detail) from exc
-
-
 async def _validate_bindings(bindings: list[dict], caller: Caller, db: AsyncSession,
                              grandfather: frozenset = frozenset()) -> None:
     try:
