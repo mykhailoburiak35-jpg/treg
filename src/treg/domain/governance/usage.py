@@ -76,10 +76,9 @@ async def seed_counter(db: AsyncSession, membership: Membership, user_email: str
     membership.calls_today_day = utcnow_naive().date()
 
 
-async def enforce_daily_cap(caller: Caller, db: AsyncSession, *, sandbox: bool) -> None:
+async def enforce_daily_cap(caller: Caller, db: AsyncSession) -> None:
     """Refuse a call/run once the caller has used their per-user daily cap for this org. `-1` (the
-    default) = unlimited, so unmetered members pay ZERO extra queries. The sandbox has its own limiter
-    and is exempt.
+    default) = unlimited, so unmetered members pay ZERO extra queries.
 
     One conditional UPDATE of the member's row (`take_daily_slot`), exact under concurrency. Fails
     OPEN if that statement cannot run: a cap is a courtesy limit an admin set on a colleague, and
@@ -87,7 +86,7 @@ async def enforce_daily_cap(caller: Caller, db: AsyncSession, *, sandbox: bool) 
     are the ones that fail closed. See docs/USAGE-METERING-PLAN.md.
     """
     cap = caller.membership.daily_call_cap
-    if cap < 0 or sandbox:
+    if cap < 0:
         return
     try:
         admitted = await take_daily_slot(db, caller.membership.id, cap)

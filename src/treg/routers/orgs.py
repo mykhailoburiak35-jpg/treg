@@ -383,9 +383,6 @@ _SIGNUP_HTTP_ERRORS = {
     "blocked_domain": (403, "this address cannot be used to sign in"),  # same words: leaks no list
     "unsafe_webhook": (422, "webhook_url must be a public http(s) URL"),
     "email_exists": (409, "email already registered"),
-    "sandbox_user": (403, (
-        "the demo sandbox can't create a real team — sign in with GitHub, Google, or email to make one"
-    )),
     "slug_conflict": (409, "could not allocate a unique org slug — retry"),
     "reserved_name": (422, "this team name is reserved: it reads as treg itself, as official, or as a "
                            "catalog provider or platform. Choose another name."),

@@ -938,7 +938,7 @@ def _pick_path(cfg: dict) -> str:
         ("catalog", "Call something now", "find a tool in the catalog and call it — no key, no setup"),
         ("setup", "Share your own keys & skills", "upload this project's .env + skills (admins)"),
         ("access", "Use your team's tools", "pull your team's shared skills + make a call"),
-        ("demo", "See how it works", "a walkthrough with a throwaway team"),
+        ("demo", "See how it works", "a guided walkthrough; nothing is created"),
     ], default="catalog")
     if picked is None:  # Ctrl-C / Esc / EOF
         raise SystemExit(0)
