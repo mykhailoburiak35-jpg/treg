@@ -19,7 +19,6 @@ from .. import crypto, health
 from .. import providers as _providers
 from .. import skills as _skills
 from ..application import connect as connect_use_cases
-from ..config import get_settings
 from ..infra.db import get_session
 from ..domain.governance import access as access_policy
 from ..domain.tools import SecretOwnershipError, ToolConfigError
@@ -289,17 +288,6 @@ async def _validate_cli_secrets(cli: dict | None, caller: Caller, db: AsyncSessi
         raise HTTPException(status_code=403, detail=exc.detail) from exc
     except ToolConfigError as exc:
         raise HTTPException(status_code=422, detail=exc.detail) from exc
-
-
-def _allowed_server_bins() -> set[str]:
-    """The commands `treg run --server` may execute: catalog-known CLIs + an admin allow-list. Blocks a
-    member naming `bash`/`python` to run arbitrary code as the server user (docs/CLI-RUN-PLAN.md Option A)."""
-    from . import providers as prov
-    bins = {(e.get("cli") or {}).get("bin") for e in prov.CATALOG}
-    bins.discard(None)
-    extra = get_settings().run_allowed_bins
-    bins |= {b.strip() for b in extra.split(",") if b.strip()}
-    return bins  # type: ignore[return-value]
 
 
 @app.post("/tools")

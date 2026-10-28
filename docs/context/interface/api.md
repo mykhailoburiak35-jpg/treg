@@ -57,7 +57,6 @@ sources:
   - src/treg/timeutil.py
   - src/treg/domain/catalog/store.py
   - src/treg/email.py
-  - src/treg/runner.py
   - src/treg/ratestore.py
   - tests/test_cli_pairing.py
 related:
@@ -527,8 +526,8 @@ shared HTTP client. `/auth/logout` remains an HTTP-only cookie action.
   `credential_invalid` marks the injected secret(s) invalid via the health fields, skipping `param` kind.
 - **Server runs (`treg run --server`):** `POST /run` unconditionally returns 503 with
   `Server-side CLI execution is disabled`. The handler has no body, authentication or database
-  dependencies and cannot reach the runner. This applies to every caller, including ordinary teams
-  and sandbox visitors; CLI profiles and `TREG_RUN_ALLOWED_BINS` cannot re-enable it. `_tool_view`
+  dependencies, and the server-side runner is removed. This applies to every caller; no CLI profile
+  or setting re-enables it. `_tool_view`
   reports `server_runnable: false` for every tool. Scrubbed environments and resource limits are not
   a filesystem/process isolation boundary.
 

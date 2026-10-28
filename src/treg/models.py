@@ -653,8 +653,8 @@ class Bundle(SQLModel, table=True):
     """A skill: the named grouping of a recipe (SKILL.md) + its secrets + its tool(s) — pure
     packaging. "Register a skill" creates a bundle; its secrets/tools point back via `bundle_id`.
 
-    Execution config (both `treg run` tiers) lives on `Tool.cli` — one profile, read by the local
-    grant path and the server runner alike (see docs/CLI-RUN-PLAN.md). The old bundle-side run
+    Execution config for `treg run` lives on `Tool.cli` — one profile, read by the local grant path
+    (see docs/context/architecture/local-run.md). The old bundle-side run
     columns (runtime/package/entrypoint/runnable) were folded into `Tool.cli` by a startup
     migration; they may still exist physically in older databases but nothing reads them.
     """

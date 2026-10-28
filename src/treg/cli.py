@@ -1964,16 +1964,15 @@ def _import_add_cli(args, cfg) -> None:
                 bindings = [{"via": "header", "name": "Authorization", "format": "Bearer {secret}", "secret_id": sid}]
             else:  # env var named but not set → register the profile; user sets it, re-run tools work
                 profile["inject"] = [{"via": "env", "name": envvar}]
-                print(f"  note: {envvar} isn't set — the tool is registered; set it before running server-side.")
+                print(f"  note: {envvar} isn't set — the tool is registered; store the key before running it.")
         rt = c.post("/tools", json={"name": name, "base_url": base_url, "bindings": bindings, "cli": profile})
         if rt.status_code >= 400:
             sys.exit(f"tool failed ({rt.status_code}) {rt.text[:120]}")
-    # An unknown bin is NOT on the server allow-list (the RCE guard), so it runs LOCALLY; server-run needs
-    # an admin to allow-list the bin. If a key was bound it's also a callable HTTP tool.
+    # An unknown bin runs locally. If a key was bound it's also a callable HTTP tool.
     print(f"✓ Registered '{name}'. Run it locally: `treg cli run {name}`.")
     print(f"  ↗ {_detail_url(cfg, 'tool', name)}")
     if bindings:
-        print(f"  (key stored — also a callable API tool; to run '{bin_}' on the SERVER too, an admin adds it to TREG_RUN_ALLOWED_BINS.)")
+        print("  (key stored — also a callable API tool.)")
     import json as _json
     entry = {"provider": name.title(), "tokens": [envvar.split("_")[0]] if envvar else [], "base_url": base_url,
              "auth": {"shape": "bearer"},
@@ -2871,7 +2870,7 @@ def cmd_audit(args, cfg) -> None:
 
 
 def cmd_run(args, cfg) -> None:
-    """`treg run <tool> -- <args>` dispatcher over two execution tiers (docs/CLI-RUN-PLAN.md):
+    """`treg run <tool> -- <args>` dispatcher over two execution tiers (docs/context/interface/cli.md):
       --local  (default): run the CLI on THIS machine; the credential is isolated under the treg-run user.
       --server          : run the CLI on the registry server (Tier 0), streaming stdout/stderr back.
     """

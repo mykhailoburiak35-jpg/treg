@@ -204,8 +204,8 @@ async def _count_owners(org_id: int, db: AsyncSession) -> int:
 
 
 async def _used_today_by_user(db: AsyncSession, org_id: int) -> dict[str, int]:
-    """{user_email: events today} for every member of the org — one grouped COUNT per table, so the
-    members list gets everyone's usage without an N+1 fan-out. Spans all kinds (calls + local + server).
+    """{user_email: events today} for every member of the org — one grouped COUNT, so the members
+    list gets everyone's usage without an N+1 fan-out. Spans calls and local runs.
     Once the usage rollup has caught up, calls come from today's rollup rows plus the audit rows after
     its cursor; until then from the audit table itself."""
     since = _day_start_utc()
@@ -217,9 +217,6 @@ async def _used_today_by_user(db: AsyncSession, org_id: int) -> dict[str, int]:
         calls = (await db.execute(select(CallRecord.user_email, func.count()).where(
             CallRecord.org_id == org_id, CallRecord.created_at >= since).group_by(CallRecord.user_email))).all()
     for email, n in calls:
-        counts[email] = counts.get(email, 0) + n
-    for email, n in (await db.execute(select(RunRecord.user_email, func.count()).where(
-            RunRecord.org_id == org_id, RunRecord.created_at >= since).group_by(RunRecord.user_email))).all():
         counts[email] = counts.get(email, 0) + n
     return counts
 
