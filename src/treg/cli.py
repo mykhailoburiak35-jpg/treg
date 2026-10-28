@@ -1847,7 +1847,7 @@ def _import_clis(args, cfg, env_path: str) -> None:
     """Scan the machine for INSTALLED catalog CLIs, classify each (server-injectable / local / gap), and
     register the ready ones on the right tier — server-side when treg can hold the key, local when the
     credential lives in the CLI's own config. Prints an actionable report; fix a gap and re-run. `--status`
-    (or `--dry-run`) reports without registering. See docs/CLI-AUTOIMPORT-PLAN.md."""
+    (or `--dry-run`) reports without registering. See docs/context/interface/env-import.md."""
     import shutil
     from . import providers as prov
     if getattr(args, "add", None):  # register an UNKNOWN (non-catalog) installed CLI
@@ -3707,7 +3707,7 @@ def cmd_serve_env(args, cfg) -> None:
 
 def cmd_shell_start(args, cfg) -> None:
     """Open a subshell where the team's registered CLIs run with the credential injected — the member
-    types `stripe …`/`gh …` normally and treg handles auth behind the scenes (docs/CLI-SHELL-MODE-PLAN.md).
+    types `stripe …`/`gh …` normally and treg handles auth behind the scenes (docs/context/interface/shell.md).
     MVP: shims call `treg run <tool>`, reusing the whole local-run path. With `--proxy`, calls the
     AGENT makes directly to a registered API are caught too (docs/LOCAL-PROXY-PLAN.md)."""
     from . import shell as sh

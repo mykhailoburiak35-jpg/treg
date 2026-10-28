@@ -3,7 +3,7 @@
 Multi-tenancy (orgs) shape: an **Org** is the tenant that owns resources; a **User** is a
 global identity; a **Membership** links a user to an org with a role and IS where the caller's
 token lives (a token = a (user, org) pair). Secrets/tools/bundles/call records carry `org_id`,
-so every list/call/mutation is scoped to the caller's org. See docs/MULTI-TENANCY-PLAN.md.
+so every list/call/mutation is scoped to the caller's org. See docs/context/architecture/multi-tenancy.md.
 """
 
 from __future__ import annotations
@@ -1763,7 +1763,7 @@ class CapacityPolicy(SQLModel, table=True):
     `source` how we learn it (its free account API, response headers, a calculation, a hand entry,
     nothing). `unknown`/`none` are honest defaults for a provider nobody has classified yet — a
     sweep flags them rather than inventing a number. Numbers only: no key or payment detail lives
-    here. See docs/PROVIDER-CAPACITY-PLAN.md §2.2.
+    here. See docs/context/ops/capacity.md.
     """
 
     provider: str = Field(primary_key=True)
@@ -1823,7 +1823,7 @@ class OverflowRoute(SQLModel, table=True):
     `enabled` is DERIVED by `domain.capacity.routes.eligible` at sync time (same unit, ratio ≤ 4,
     platform-eligible, policy allows, verified < 7 days ago); the call path only ever reads it.
     Prices are the aggregator's list price in micro-USD: the caller pays exactly that, 0% markup,
-    disclosed in-band. See docs/PROVIDER-CAPACITY-PLAN.md §4.3.
+    disclosed in-band. See docs/context/architecture/proxy-model.md § Overflow.
     """
 
     endpoint_id: str = Field(primary_key=True)
