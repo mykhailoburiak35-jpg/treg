@@ -1182,8 +1182,7 @@ async def _store_locked(
             # newest row may only be intervening unknown/error evidence, not this baseline.
             comparison_baseline = baseline
         key.policy = pol
-        if not history_only:
-            # The key's fetch time is its servable answer's: refresh ages it from there.
+        if not history_only or origin == "refresh":
             key.fetched_at = now
         if origin == "caller":     # a refresh is treg asking itself — never demand
             key.last_requested_at = now

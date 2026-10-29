@@ -597,8 +597,8 @@ it. Migration `0091` adds three nullable columns; NULL is every row from before 
   not recorded at all. It is never served: a legacy key serves its newest answer that is not
   history-only, and a result-aware key its decisive one (the rejected body classifies as an
   `expect_failed` error). It is never a comparison baseline or learning evidence (no stable or
-  change count, no timer step, no change event), it does not move the key's `fetched_at`, which
-  refresh ages, and it does not mark the team as having paid for the question (`ArchiveKeyOrg`).
+  change count, no timer step, no change event), a caller's does not move the key's `fetched_at`,
+  which refresh ages (a refresh's does, so a failed refresh waits a full window), and it does not mark the team as having paid for the question (`ArchiveKeyOrg`).
   The call row still links to it, so `/calls/{id}/result` shows the team the failure it got.
 
 Every other recording rule still holds: an opted-out team records nothing, an answer quoting

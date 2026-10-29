@@ -159,6 +159,26 @@ async def test_a_question_only_ever_failed_is_never_served_or_refreshed(
     assert await archive.refresh_once(fake) == 0 and fake.calls == []
 
 
+async def test_a_refresh_answered_with_an_expect_failure_waits_a_full_window(
+        clients: AsyncClient, serve, legacy_expect, monkeypatch):
+    _vendor(monkeypatch, (FOUND, ()))
+    await clients.get(f"/call/{EP}?aweme_id=7")
+    await archive.drain()
+    async with session_maker() as s:
+        key = (await s.execute(select(ArchiveKey))).scalars().one()
+        key.fetched_at -= timedelta(days=1)
+        key.last_requested_at = key.fetched_at + timedelta(seconds=60)
+        s.add(key)
+        await s.commit()
+    fake = _FakeUpstream(FAILED)
+    assert await archive.refresh_once(fake) == 1
+    assert await archive.refresh_once(fake) == 0 and len(fake.calls) == 1
+    _, snaps = await _rows()
+    assert [(s.origin, s.history_only) for s in snaps] == [("caller", None), ("refresh", True)]
+    r = await clients.get(f"/call/{EP}?aweme_id=7")
+    assert r.headers.get("x-treg-cache") == "hit" and r.content == FOUND
+
+
 async def test_an_expect_failure_on_a_result_aware_endpoint_keeps_the_decisive_answer(
         clients: AsyncClient, serve, monkeypatch):
     monkeypatch.setitem(catalog_store.load().by_id[EP], "expect", {"json_path": "code", "equals": 0})
