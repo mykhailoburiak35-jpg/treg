@@ -136,7 +136,9 @@ A declaration is a YAML mapping; a file holds a list of them:
 ```
 
 A changed field is declared when some declaration matches its endpoint or provider, its field, its
-old and new values and its `where`.
+old and new values and its `where`. A list value matches a list field element for element. The
+report names the first matching declaration, but every declaration that matches some change
+counts as exercised.
 
 ## In CI
 
