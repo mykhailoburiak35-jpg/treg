@@ -246,6 +246,27 @@ def test_a_declaration_matches_on_from_to_and_where():
     assert not report.passed
 
 
+def test_a_declaration_matches_a_list_valued_field():
+    base = {"r1": _line("r1", routing={"why": ["empty_core"]})}
+    cand = {"r1": _line("r1", routing={"why": ["adapter_miss"]})}
+    rule = differ.parse_declarations([{"endpoint": "acme.lookup", "field": "routing.why",
+                                       "from": ["empty_core"], "to": ["adapter_miss"],
+                                       "reason": "stricter adapter"}])
+    report = differ.compare(base, cand, rule)
+    assert report.passed and not report.untested_declarations
+
+
+def test_every_declaration_a_change_matches_is_exercised():
+    base = {"r1": _line("r1", settle={"actual_micro": 4000})}
+    cand = {"r1": _line("r1", settle={"actual_micro": 0})}
+    broad, narrow = differ.parse_declarations([
+        {"provider": "acme", "field": "settle.*", "reason": "broad"},
+        {"endpoint": "acme.lookup", "field": "settle.actual_micro", "to": 0, "reason": "narrow"}])
+    report = differ.compare(base, cand, [broad, narrow])
+    assert report.passed and not report.untested_declarations
+    assert [declared for _, declared in report.changes] == [broad]
+
+
 def test_the_report_shows_amounts_and_codes_never_text():
     base = {"r1": _line("r1", settle={"actual_micro": 4000, "reason": "a free-text reason"})}
     cand = {"r1": _line("r1", settle={"actual_micro": 0, "reason": "rejected_unbilled_400"})}

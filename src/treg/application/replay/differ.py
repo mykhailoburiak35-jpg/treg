@@ -50,8 +50,9 @@ class Declaration:
             raise ValueError(f"declaration {n}: `where` maps fields to values")
         return cls(reason=str(raw["reason"]), endpoint=raw.get("endpoint"),
                    provider=raw.get("provider"), field=str(raw.get("field") or "*"),
-                   from_value=raw.get("from"), to_value=raw.get("to"),
-                   has_from="from" in raw, has_to="to" in raw, where=dict(where))
+                   from_value=_value(raw.get("from")), to_value=_value(raw.get("to")),
+                   has_from="from" in raw, has_to="to" in raw,
+                   where={k: _value(v) for k, v in where.items()})
 
     def matches(self, change: "Change") -> bool:
         if self.endpoint is not None and not fnmatch.fnmatchcase(change.endpoint_id, self.endpoint):
@@ -65,6 +66,10 @@ class Declaration:
         if self.has_to and change.new != self.to_value:
             return False
         return all(change.candidate.get(k) == v for k, v in self.where.items())
+
+
+def _value(item: object) -> object:
+    return tuple(item) if isinstance(item, list) else item
 
 
 @dataclass(frozen=True)
@@ -108,7 +113,7 @@ def flatten(line: dict) -> dict[str, object]:
             out[group] = value
             continue
         for key, item in value.items():
-            out[f"{group}.{key}"] = tuple(item) if isinstance(item, list) else item
+            out[f"{group}.{key}"] = _value(item)
     return out
 
 
@@ -141,11 +146,9 @@ def compare(baseline: dict[str, dict], candidate: dict[str, dict],
                 continue
             change = Change(rid, endpoint_id, new_line.get("provider") or old_line.get("provider"),
                             cls, name, before, after, new)
-            n, declared = next(((n, d) for n, d in enumerate(declarations) if d.matches(change)),
-                               (None, None))
-            if n is not None:
-                used.add(n)
-            report.changes.append((change, declared))
+            matched = [n for n, d in enumerate(declarations) if d.matches(change)]
+            used.update(matched)
+            report.changes.append((change, declarations[matched[0]] if matched else None))
     report.untested_declarations = [d for n, d in enumerate(declarations) if n not in used]
     if base_fingerprints is not None and candidate_fingerprints is not None:
         touched = {e for e in base_fingerprints.keys() | candidate_fingerprints.keys()
