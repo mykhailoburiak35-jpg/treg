@@ -56,10 +56,13 @@ def test_an_answer_settles_at_its_credits_used(name, eid, micro):
 
 def test_the_adapters_read_the_live_answers():
     cat = cs.load()
-    verify = cat.adapters["filtrat.people.email.verify"]
-    out = verify.from_upstream(_example("filtrat.people.email.verify"))
+    assert "filtrat.people.email.verify" not in cat.adapters    # the general route resolves catch-alls
+    verify = cat.adapters["filtrat.people.email.verify.resolve_catchall"]
+    assert verify.to_upstream({"email": "a@b.test"}, None)[1]["resolve_catchall"] is True
+    resolved = _example("filtrat.people.email.verify.resolve_catchall")    # a catch-all domain, resolved
+    out = verify.from_upstream(resolved)
     assert out["valid"] is True and out["status"] == "verified"
-    assert verify.verdict_word(verify.verdict_raw(_example("filtrat.people.email.verify"))) == "valid"
+    assert verify.verdict_word(verify.verdict_raw(resolved)) == "valid"
     assert verify.is_miss({"status": "unknown", "credits_used": 0.0})
     assert verify.verdict_word("catchall") == "catch_all"
 

@@ -1,14 +1,15 @@
 # Filtrat: email verification (with optional catch-all resolution) and email finding. Every call is
-# synchronous and answers within 175 seconds; each answer reports its own charge in credits_used,
-# which settles the call (repeat checks are charged too on treg's partner account). Bulk jobs,
-# LinkedIn lookups, lists, monitors and AI routes are not listed (see the PR's surface map).
+# synchronous; each answer reports its own charge in credits_used, which settles the call. A repeat
+# of a check the account already made is free (is_cached: true, credits_used 0); credits_list
+# carries the price the same answer has when checked anew. Bulk jobs, LinkedIn lookups, lists,
+# monitors and AI routes are not listed (see the PR's surface map).
 provider: filtrat
 source:
   docs: https://filtrat.io/v1/docs
   openapi: https://filtrat.io/openapi.json
   curated: '2026-10-29'
 pricing_url: https://filtrat.io/v1/credits/rate-card
-limits: "Per key: 60 verifications and 20 finder searches a minute on treg's partner account (other keys: 200 a minute each), answered with 429 and Retry-After: 60 above that. Every call answers within 175 seconds."
+limits: "Per key: 600 verifications and 200 finder searches a minute on treg's partner account (other keys: 200 a minute each), answered with 429 and Retry-After: 60 above that. A finder search on treg's key answers within 20 seconds (not found and free if it takes longer); a verification within 175 seconds."
 cache: forbidden
 endpoints:
   - id: filtrat.people.email.verify
